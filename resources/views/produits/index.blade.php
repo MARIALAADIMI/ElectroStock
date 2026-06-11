@@ -9,6 +9,10 @@
 
 <body>
     <div class="">
+                 <div>
+                <a href="{{ route('factures.index') }}">Liste des factures</a>
+                <a href="{{ route('clients.index') }}">Liste des clients</a>
+            </div>
         <div class="">
             <h2>{{ isset($editProduit) ? 'Modifier le produit' : 'Ajouter un produit' }}</h2>
         </div>
