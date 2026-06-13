@@ -21,11 +21,9 @@ class ClientController extends Controller
                   ->orWhere('prenom', 'like', "%{$query}%")
                   ->orWhere('tel', 'like', "%{$query}%");
             })
-            ->get();
+            ->paginate(10);
 
-        $editClient = $request->has('edit')
-            ? Client::find($request->edit)
-            : null;
+        $editClient = $request->has('edit') ? Client::find($request->edit) : null;
 
         return view('clients.index', compact('clients', 'editClient'));
     }
