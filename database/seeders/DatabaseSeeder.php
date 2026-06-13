@@ -3,26 +3,38 @@
 namespace Database\Seeders;
 
 use App\Models\Client;
+use App\Models\DetailFacture;
+use App\Models\Facture;
+use App\Models\Produit;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        User::factory(10)->create();
 
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        
+        User::truncate();
+        Produit::truncate();
+        Client::truncate();
+        Facture::truncate();
+        DetailFacture::truncate();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password'=> bcrypt('password')
+            'name' => 'Admin ElectroStock',
+            'email' => 'admin@electrostock.ma',
+            'password' => bcrypt('password'),
+        ]);
+
+        $this->call([
+            ProduitSeeder::class,
+            ClientSeeder::class,
+            FactureSeeder::class,
         ]);
     }
 }
