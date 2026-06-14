@@ -38,7 +38,7 @@
                         value="{{ old('code', $editProduit->code ?? '') }}" required></div>
                 <div class="form-group"><label>Libellé</label><input type="text" name="libelle"
                         value="{{ old('libelle', $editProduit->libelle ?? '') }}" required></div>
-                <div class="form-group"><label>Prix (MAD)</label><input type="number" step="0.01" name="prix"
+                <div class="form-group"><label>Prix (DH)</label><input type="number" step="0.01" name="prix"
                         value="{{ old('prix', $editProduit->prix ?? '') }}" required></div>
                 <div class="form-group"><label>Quantité</label><input type="number" name="qte"
                         value="{{ old('qte', $editProduit->qte ?? '') }}" required></div>
