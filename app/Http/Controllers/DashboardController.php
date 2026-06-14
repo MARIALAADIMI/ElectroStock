@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Produit;
 use App\Models\Client;
-use App\Models\Facture;
 use App\Models\DetailFacture;
+use App\Models\Facture;
+use App\Models\Produit;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -23,9 +23,9 @@ class DashboardController extends Controller
         $currentYear = date('Y');
         $ventesParMois = array_fill(0, 12, 0);
         $salesData = Facture::select(
-                DB::raw('MONTH(date) as month'),
-                DB::raw('SUM(montant_total) as total')
-            )
+            DB::raw('MONTH(date) as month'),
+            DB::raw('SUM(montant_total) as total')
+        )
             ->whereYear('date', $currentYear)
             ->groupBy('month')
             ->orderBy('month')
@@ -36,7 +36,7 @@ class DashboardController extends Controller
         }
         $RevenusByMounth = $ventesParMois;
 
-       $topProduits = DetailFacture::select('id_produit', DB::raw('SUM(qte_prod) as total_vendu'))
+        $topProduits = DetailFacture::select('id_produit', DB::raw('SUM(qte_prod) as total_vendu'))
             ->groupBy('id_produit')
             ->orderByDesc('total_vendu')
             ->with('produit')
@@ -48,16 +48,38 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        $stockOk = Produit::where('qte', '>=', 10)->count();
+        $stockFaible = Produit::where('qte', '>', 0)->where('qte', '<', 10)->count();
+        $stockRupture = Produit::where('qte', '=', 0)->count();
+
+       $topProduitsCA = DetailFacture::select('id_produit', DB::raw('SUM(qte_prod * prix_unitaire_prod) as total_ca'))
+            ->groupBy('id_produit')
+            ->orderByDesc('total_ca')
+            ->with('produit')
+            ->take(5)
+            ->get();
+
+        $clientsParMois = array_fill(0, 12, 0);
+        $clientsData = Client::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+            ->whereYear('created_at', $currentYear)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
+        foreach ($clientsData as $month => $total) {
+            $clientsParMois[$month - 1] = $total;
+        }
+        $clientsParMoisArray = array_values($clientsParMois);
+
         return view('Dashboard', compact(
-            'Totalstock', 
-            'TotalProduits', 
-            'TotalClient', 
-            'TotalRevenu', 
-            'ReptureStock', 
-            'StockFaible', 
-            'RevenusByMounth',
-            'topProduits',
+            'Totalstock', 'TotalProduits', 'TotalClient', 'TotalRevenu',
+            'ReptureStock', 'StockFaible', 'RevenusByMounth',
+            'stockOk', 'stockFaible', 'stockRupture',
+            'topProduitsCA', 'clientsParMoisArray', 'topProduits',
             'recentFactures'
         ));
+
+       
     }
 }
